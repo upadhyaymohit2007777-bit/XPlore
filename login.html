@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="Log in to XPlore — access your course materials, daily quizzes, and academic assignments.">
+  <title>XPlore — Student Portal</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Official Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    :root {
+      --background: #f8fafd;
+      --surface: #ffffff;
+      --surface-subtle: #f0f7ff;
+      --purple: #2563eb;
+      --purple-light: #38bdf8;
+      --purple-dark: #1d4ed8;
+      --lavender: #eff6ff;
+      --lavender-border: #bfdbfe;
+      --text: #0f172a;
+      --muted: #64748b;
+      --green: #059669;
+      --green-dark: #047857;
+      --mint: #ecfdf5;
+      --gold: #b45309;
+      --gold-bg: #fef3c7;
+      --gold-border: #fde68a;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(37, 99, 235, 0.04);
+      --shadow-md: 0 6px 18px -2px rgba(15, 23, 42, 0.05), 0 3px 6px -2px rgba(37, 99, 235, 0.04);
+      --shadow-lg: 0 16px 36px -4px rgba(15, 23, 42, 0.08), 0 6px 14px -2px rgba(37, 99, 235, 0.06);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 10% 10%, #e0f2fe 0%, #f8fafd 45%, #ffffff 100%);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+
+    button:focus-visible, a:focus-visible, input:focus-visible {
+      outline: 3px solid var(--purple);
+      outline-offset: 3px;
+    }
+
+    /* Container wrapper */
+    .app {
+      width: 100%;
+      max-width: 520px;
+      margin: 32px auto 60px;
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* App Header */
+    .app-header {
+      width: 100%;
+      margin-bottom: 24px;
+    }
+
+    .top-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 18px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .brand-orb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 12px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 15px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+    .icon-btn:hover { color: var(--purple); border-color: var(--lavender-border); transform: scale(1.05); }
+
+    /* Scrollable Canvas */
+    main {
+      padding: 24px 22px 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Hero Branding on Login */
+    .hero-banner {
+      text-align: center;
+      padding: 12px 8px 6px;
+    }
+
+    .login-hero-mark {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(148, 123, 250, 0.22));
+      border: 1.5px solid var(--lavender-border);
+      display: grid;
+      place-items: center;
+      color: var(--purple);
+    }
+    .old-sculpture {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #ffffff, #dcd2ff 85%);
+      box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22), inset -3px -4px 6px rgba(187, 170, 227, 0.4);
+      display: grid;
+      place-items: center;
+      font-size: 42px;
+      border: 3px solid white;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .eyebrow {
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    h1 {
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: -.6px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* Card Styling */
+    .card {
+      padding: 24px 20px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* Google Sign In Button */
+    .google-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 13px 20px;
+      background: #ffffff;
+      color: #3c4043;
+      border: 1.5px solid #dadce0;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(60, 64, 67, 0.08);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .google-btn:hover {
+      background: #f8faff;
+      border-color: #d2e3fc;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.15);
+      transform: translateY(-1px);
+    }
+
+    .google-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 1px 2px rgba(60, 64, 67, 0.12);
+    }
+
+    .google-icon {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+    }
+
+    /* Or Divider */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .or-divider::before, .or-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* Form Inputs */
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: var(--muted);
+      font-size: 16px;
+      pointer-events: none;
+    }
+
+    .text-input {
+      width: 100%;
+      padding: 13px 14px 13px 40px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface-subtle);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    .text-input:focus {
+      border-color: var(--purple);
+      background: white;
+      box-shadow: 0 0 0 3px var(--lavender);
+      outline: none;
+    }
+
+    .toggle-pass-btn {
+      position: absolute;
+      right: 12px;
+      color: var(--muted);
+      font-size: 16px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    .row-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember-me input {
+      accent-color: var(--purple);
+      cursor: pointer;
+    }
+
+    .forgot-link {
+      color: var(--purple);
+      font-weight: 600;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
+    /* Tactile 3D Button */
+    .button {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 13px 20px;
+      border: 0;
+      border-radius: var(--radius-md);
+      background: var(--purple);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: 0 4px 0 var(--purple-dark), 0 8px 16px rgba(37, 99, 235, 0.22);
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+      cursor: pointer;
+    }
+
+    .button:hover { background: #6447d2; }
+    .button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 var(--purple-dark), 0 4px 8px rgba(37, 99, 235, 0.18);
+    }
+
+    .button.secondary {
+      background: var(--lavender);
+      color: var(--purple);
+      box-shadow: 0 4px 0 #d9cefb;
+    }
+    .button.secondary:hover { background: #e5ddff; }
+    .button.secondary:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #d9cefb;
+    }
+
+    /* Guest / Demo Fast Login Card */
+    .guest-card {
+      background: linear-gradient(145deg, #f3efff 0%, #ebe4ff 100%);
+      border: 1px solid var(--lavender-border);
+      padding: 18px 20px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .monogram-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 30px;
+      background: var(--lavender);
+      color: var(--purple);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* Footer info */
+    .auth-footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .auth-footer a {
+      color: var(--purple);
+      font-weight: 700;
+    }
+    .auth-footer a:hover { text-decoration: underline; }
+
+    /* Google OAuth Account Picker Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 12, 36, 0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-sheet {
+      width: 100%;
+      max-width: 440px;
+      background: white;
+      border-radius: 28px 28px 0 0;
+      padding: 24px 24px max(24px, env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 36px rgba(25, 15, 55, 0.25);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.active .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-handle {
+      width: 42px;
+      height: 5px;
+      background: #e0dced;
+      border-radius: 10px;
+      margin: 0 auto 16px;
+    }
+
+    .google-modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+
+
+    .account-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-subtle);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .account-item:hover {
+      border-color: #4285f4;
+      background: #f8faff;
+      transform: translateX(2px);
+    }
+
+    .account-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #ffffff, #dcd2ff);
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      border: 1px solid var(--border);
+    }
+
+    .account-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .account-email { font-size: 12px; color: var(--muted); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #231b3b;
+      color: white;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 200;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* Loading Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    
+    <span id="toast-message">Notification</span>
+  </div>
+
+  <div class="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="top-toolbar">
+        <div class="brand-mark">
+          <div class="brand-orb" aria-hidden="true">XP</div>
+          <span>XPlore</span>
+        </div>
+
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <a href="index.html" class="icon-btn" title="Back to Course" aria-label="Return to Dashboard" style="width: auto; border-radius: 8px; padding: 6px 12px;">
+            <span style="font-size: 12px; font-weight: 600;">← Back to Course</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="scroll-container">
+      <main>
+        <!-- Hero Branding -->
+        <div class="hero-banner">
+          <div class="login-hero-mark" aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 14px; background: rgba(37, 99, 235, 0.1); margin-bottom: 20px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+          <p class="eyebrow">STUDENT &amp; FACULTY PORTAL</p>
+          <h1>Student Portal</h1>
+          <p class="subtitle">Log in to access your course materials, daily quizzes, and coursework.</p>
+        </div>
+
+        <!-- Main Auth Card -->
+        <div class="card">
+          <!-- Real Google Identity Services Button Container (rendered when Client ID is set) -->
+          <div id="google-real-btn-container" style="display: none; margin-bottom: 6px; width: 100%;"></div>
+
+          <!-- Interactive Google Sign In Button -->
+          <button type="button" class="google-btn" id="google-login-btn">
+            <svg class="google-icon" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+            </svg>
+            <span id="google-btn-text">Continue with University Google Account</span>
+          </button>
+
+          <div class="or-divider">or with student credentials</div>
+
+          <!-- Email / Password Form -->
+          <form id="email-login-form">
+            <div class="input-group">
+              <label class="input-label" for="email-field">Student Email Address</label>
+              <div class="input-wrapper">
+                <span class="input-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg></span>
+                <input class="text-input" type="text" id="email-field" placeholder="maya.chen@university.edu" required autocomplete="username">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label class="input-label" for="password-field">Password</label>
+              <div class="input-wrapper">
+                <span class="input-icon" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></span>
+                <input class="text-input" type="password" id="password-field" placeholder="••••••••" required autocomplete="current-password">
+                <button type="button" class="toggle-pass-btn" id="toggle-pass-btn" aria-label="Toggle password visibility" style="font-size: 11px; font-weight: 700; color: var(--purple); background: var(--lavender); border-radius: 4px; padding: 3px 6px;">Show</button>
+              </div>
+            </div>
+
+            <div class="row-between">
+              <label class="remember-me">
+                <input type="checkbox" id="remember-checkbox" checked>
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="forgot-link" onclick="alert('Password reset instructions have been sent to your school administrator.'); return false;">Forgot?</a>
+            </div>
+
+            <button type="submit" class="button" id="submit-login-btn">
+              <span>Sign In to XPlore</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Saved Student Session Card -->
+        <div class="guest-card">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="monogram-avatar">MC</div>
+            <div>
+              <h3 style="font-size: 13.5px; font-weight: 700;">Active Student Session</h3>
+              <p class="tiny muted">Maya Chen · Student Cohort · Enrolled</p>
+            </div>
+          </div>
+          <button type="button" class="button secondary" style="width: auto; padding: 7px 14px; font-size: 12px; font-weight: 700;" id="fast-maya-btn">
+            Resume →
+          </button>
+        </div>
+
+        <p class="auth-footer">
+          Enrolled in Coursework<br>
+          <span class="tiny muted">Protected by University Single Sign-On Policies</span>
+        </p>
+      </main>
+    </div>
+  </div>
+
+  <!-- Google Sign In Account Chooser Modal -->
+  <div class="modal-overlay" id="google-modal" role="dialog" aria-modal="true" aria-labelledby="google-modal-title">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="google-modal-header">
+        <svg style="width: 28px; height: 28px;" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <div>
+          <h2 id="google-modal-title" style="font-size: 17px; font-weight: 700;">Sign in with Google</h2>
+          <p class="tiny muted">to continue to <strong>XPlore Learning</strong></p>
+        </div>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <!-- Option 1: School Account -->
+        <div class="account-item" id="google-acc-maya">
+          <div class="account-avatar" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: white; font-weight: 800; font-size: 13px;">MC</div>
+          <div style="flex: 1;">
+            <div class="account-name">Maya Chen</div>
+            <div class="account-email">maya.chen@university.edu</div>
+          </div>
+          <span class="pill mint" style="font-size: 10px;">Enrolled Student</span>
+        </div>
+
+        <!-- Option 2: Personal Google Account -->
+        <div class="account-item" id="google-acc-alex">
+          <div class="account-avatar" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: white; font-weight: 800; font-size: 13px;">AR</div>
+          <div style="flex: 1;">
+            <div class="account-name">Alex Rivera</div>
+            <div class="account-email">alex.rivera@university.edu</div>
+          </div>
+          <span class="pill" style="font-size: 10px;">Student Cohort</span>
+        </div>
+
+        <!-- Option 3: Use another account -->
+        <div class="account-item" id="google-acc-custom">
+          <div class="account-avatar" style="font-size: 16px; background: var(--surface-subtle); color: var(--muted); border: 1px solid var(--border);">+</div>
+          <div style="flex: 1;">
+            <div class="account-name">Use another Google account</div>
+            <div class="account-email">Enter university or personal email</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Google Cloud OAuth Client ID Setting -->
+      <div style="border-top: 1px solid var(--border); margin-top: 16px; padding-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span class="eyebrow" style="margin: 0;">LIVE GOOGLE OAUTH CLIENT ID</span>
+          <span class="pill" style="font-size: 10px;" id="client-id-status">Google Cloud GIS</span>
+        </div>
+        <p class="tiny muted" style="margin-bottom: 8px;">
+          Paste your Google Cloud OAuth Client ID to turn on real Google Sign-In & One-Tap:
+        </p>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="custom-client-id-input" class="text-input" style="padding: 9px 12px; font-size: 12px; flex: 1;" placeholder="xxxx.apps.googleusercontent.com">
+          <button type="button" class="button" style="width: auto; padding: 9px 16px; font-size: 12px;" id="save-client-id-btn">Save</button>
+        </div>
+      </div>
+
+      <button type="button" class="button secondary" style="margin-top: 14px;" id="cancel-google-modal-btn">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <script>
+    /* ================= SOUND ENGINE ================= */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      }
+      playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) {}
+      }
+      playSuccess() {
+        this.playTone(523.25, 'triangle', 0.12, 0.15);
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.2, 0.15), 100);
+      }
+      playClick() {
+        this.playTone(800, 'sine', 0.04, 0.04);
+      }
+    }
+    const sound = new SoundEngine();
+
+    function showToast(msg, icon = "") {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-message").textContent = msg;
+      const iconEl = document.getElementById("toast-icon"); if (iconEl) iconEl.textContent = icon;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+
+    /* ================= AUTHENTICATION ACTIONS ================= */
+    function completeLogin(userProfile) {
+      sound.playSuccess();
+      localStorage.setItem("xplore_user_session", JSON.stringify(userProfile));
+      localStorage.setItem("orbit_user_session", JSON.stringify(userProfile));
+      showToast(`Welcome back, ${userProfile.name}!`);
+
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 700);
+    }
+
+    // Toggle Password Visibility
+    const passInput = document.getElementById("password-field");
+    const togglePassBtn = document.getElementById("toggle-pass-btn");
+    togglePassBtn.addEventListener("click", () => {
+      sound.playClick();
+      const isPassword = passInput.type === "password";
+      passInput.type = isPassword ? "text" : "password";
+      togglePassBtn.textContent = isPassword ? "Hide" : "Show";
+    });
+
+    // Email Form Submission
+    document.getElementById("email-login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email-field").value.trim();
+      const submitBtn = document.getElementById("submit-login-btn");
+      submitBtn.innerHTML = `<div class="spinner"></div> Signing in...`;
+      submitBtn.disabled = true;
+
+      setTimeout(() => {
+        const name = email.split("@")[0].replace(".", " ");
+        const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
+        completeLogin({
+          name: formattedName || "Maya Chen",
+          email: email,
+          avatar: "MC",
+          provider: "school_id",
+          isLoggedIn: true
+        });
+      }, 600);
+    });
+
+    // Saved Student Resume
+    document.getElementById("fast-maya-btn").addEventListener("click", () => {
+      completeLogin({
+        name: "Maya Chen",
+        email: "maya.chen@school.edu",
+        avatar: "MC",
+        provider: "saved_session",
+        isLoggedIn: true
+      });
+    });
+
+    // Google Sign In Modal
+    const googleModal = document.getElementById("google-modal");
+    document.getElementById("google-login-btn").addEventListener("click", () => {
+      sound.playClick();
+      googleModal.classList.add("active");
+    });
+
+    document.getElementById("cancel-google-modal-btn").addEventListener("click", () => {
+      sound.playClick();
+      googleModal.classList.remove("active");
+    });
+
+    googleModal.addEventListener("click", (e) => {
+      if (e.target === googleModal) googleModal.classList.remove("active");
+    });
+
+    // Select Account 1: Maya Chen (Google)
+    document.getElementById("google-acc-maya").addEventListener("click", () => {
+      googleModal.classList.remove("active");
+      completeLogin({
+        name: "Maya Chen",
+        email: "maya.chen@school.edu",
+        avatar: "MC",
+        provider: "google",
+        isLoggedIn: true
+      });
+    });
+
+    // Select Account 2: Alex Rivera
+    document.getElementById("google-acc-alex").addEventListener("click", () => {
+      googleModal.classList.remove("active");
+      completeLogin({
+        name: "Alex Rivera",
+        email: "alex.rivera.space@gmail.com",
+        avatar: "AR",
+        provider: "google",
+        isLoggedIn: true
+      });
+    });
+
+    // Select Account 3: Custom Google Email
+    document.getElementById("google-acc-custom").addEventListener("click", () => {
+      const email = prompt("Enter your Google Email address:", "student@gmail.com");
+      if (email && email.trim()) {
+        googleModal.classList.remove("active");
+        completeLogin({
+          name: email.split("@")[0],
+          email: email.trim(),
+          avatar: "ST",
+          provider: "google",
+          isLoggedIn: true
+        });
+      }
+    });
+
+    /* ================= LIVE GOOGLE IDENTITY SERVICES (GIS) ================= */
+    let googleClientId = localStorage.getItem("xplore_google_client_id") || localStorage.getItem("orbit_google_client_id") || "";
+
+    function initGoogleIdentityServices() {
+      if (!window.google || !google.accounts || !google.accounts.id) {
+        setTimeout(initGoogleIdentityServices, 300);
+        return;
+      }
+
+      const statusBadge = document.getElementById("client-id-status");
+      const clientInput = document.getElementById("custom-client-id-input");
+      if (clientInput && googleClientId) clientInput.value = googleClientId;
+
+      if (googleClientId && googleClientId.trim() !== "") {
+        try {
+          google.accounts.id.initialize({
+            client_id: googleClientId.trim(),
+            callback: handleGoogleCredentialResponse,
+            auto_select: false
+          });
+
+          const container = document.getElementById("google-real-btn-container");
+          if (container) {
+            container.innerHTML = "";
+            google.accounts.id.renderButton(container, {
+              theme: "outline",
+              size: "large",
+              shape: "rectangular",
+              text: "continue_with",
+              width: 360
+            });
+            container.style.display = "block";
+            document.getElementById("google-login-btn").style.display = "none";
+          }
+
+          if (statusBadge) {
+            statusBadge.textContent = "Live Connected";
+            statusBadge.className = "pill mint";
+          }
+
+          // Optional: Google One-Tap prompt
+          google.accounts.id.prompt();
+        } catch (err) {
+          console.warn("Google Sign-In initialization note:", err);
+        }
+      } else {
+        if (statusBadge) {
+          statusBadge.textContent = "Simulated Mode";
+          statusBadge.className = "pill gold";
+        }
+      }
+    }
+
+    // Decode JWT from real Google Sign-In
+    function handleGoogleCredentialResponse(response) {
+      try {
+        const base64Url = response.credential.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        const data = JSON.parse(jsonPayload);
+        completeLogin({
+          name: data.name || "Google Student",
+          email: data.email,
+          avatar: "MC",
+          provider: "google",
+          isLoggedIn: true
+        });
+      } catch (err) {
+        console.error("Failed to parse Google credential:", err);
+        showToast("Error processing Google credential");
+      }
+    }
+
+    // Save Live Client ID Button
+    document.getElementById("save-client-id-btn").addEventListener("click", () => {
+      sound.playClick();
+      const val = document.getElementById("custom-client-id-input").value.trim();
+      if (val) {
+        googleClientId = val;
+        localStorage.setItem("xplore_google_client_id", val);
+        localStorage.setItem("orbit_google_client_id", val);
+        showToast("Client ID saved! Initializing Google Sign-In...");
+        initGoogleIdentityServices();
+      } else {
+        localStorage.removeItem("xplore_google_client_id");
+        localStorage.removeItem("orbit_google_client_id");
+        googleClientId = "";
+        showToast("Google Sign-In ready", "ℹ️");
+        document.getElementById("google-real-btn-container").style.display = "none";
+        document.getElementById("google-login-btn").style.display = "flex";
+        initGoogleIdentityServices();
+      }
+    });
+
+    window.addEventListener("load", () => {
+      initGoogleIdentityServices();
+    });
+
+    // Dynamic Clock
+    function updateClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      let minutes = String(now.getMinutes()).padStart(2, '0');
+      const clock = document.getElementById("live-clock"); if (clock) clock.textContent = `${hours}:${minutes}`;
+    }
+    updateClock();
+    setInterval(updateClock, 30000);
+  </script>
+</body>
+</html>
