@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Archives & build artifacts
+*.zip
+*.tar.gz
+
+# IDE / Editor
+.vscode/
+.idea/

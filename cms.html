@@ -1,0 +1,2345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="XPlore Faculty CMS — Publish course materials, daily quizzes, announcements, and track student telemetry.">
+  <title>XPlore — Faculty CMS & Telemetry</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --background: #f8fafd;
+      --surface: #ffffff;
+      --surface-subtle: #f0f7ff;
+      --purple: #2563eb;
+      --purple-light: #38bdf8;
+      --purple-dark: #1d4ed8;
+      --lavender: #eff6ff;
+      --lavender-border: #bfdbfe;
+      --text: #0f172a;
+      --muted: #64748b;
+      --green: #059669;
+      --green-dark: #047857;
+      --mint: #ecfdf5;
+      --gold: #b45309;
+      --gold-bg: #fef3c7;
+      --gold-border: #fde68a;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(37, 99, 235, 0.04);
+      --shadow-md: 0 6px 18px -2px rgba(15, 23, 42, 0.05), 0 3px 6px -2px rgba(37, 99, 235, 0.04);
+      --shadow-lg: 0 16px 36px -4px rgba(15, 23, 42, 0.08), 0 6px 14px -2px rgba(37, 99, 235, 0.06);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    button, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+
+    button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid var(--purple);
+      outline-offset: 3px;
+    }
+
+    /* Layout: Sidebar + Main Content */
+    .cms-layout {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* Faculty Sidebar */
+    .cms-sidebar {
+      width: 260px;
+      background: white;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      flex-shrink: 0;
+      z-index: 30;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand-mark {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 19px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .brand-orb {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 14px;
+    }
+
+    .faculty-badge {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--purple);
+      background: var(--lavender);
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      overflow-y: auto;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: var(--lavender);
+      color: var(--purple);
+    }
+
+    .nav-item.active {
+      background: var(--purple);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+      display: grid;
+      place-items: center;
+      width: 24px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .faculty-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .faculty-avatar {
+      background: linear-gradient(135deg, #2563eb, #38bdf8) !important;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%, #ffffff, #dcd2ff);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* Main Container */
+    .cms-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    .cms-topbar {
+      position: sticky;
+      top: 0;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      font-size: 20px;
+      padding: 6px;
+      cursor: pointer;
+    }
+
+    .topbar-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 700;
+      background: var(--purple);
+      color: white;
+      box-shadow: 0 3px 0 var(--purple-dark);
+      transition: all 0.15s ease;
+      cursor: pointer;
+    }
+    .action-btn:hover { background: #6447d2; }
+    .action-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--purple-dark); }
+
+    .action-btn.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .action-btn.secondary:hover { background: var(--surface-subtle); border-color: var(--lavender-border); }
+    .action-btn.secondary:active { transform: translateY(1px); }
+
+    /* Content Area */
+    .cms-content {
+      padding: 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .tab-section {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .tab-section.active {
+      display: flex;
+    }
+
+    /* Cards & Grids */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .metric-card {
+      background: white;
+      padding: 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 0.2s ease;
+    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--text);
+    }
+
+    .metric-change {
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .metric-change.positive { color: var(--green); }
+    .metric-change.neutral { color: var(--purple); }
+
+    .card {
+      background: white;
+      padding: 24px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Data Tables */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    th {
+      padding: 12px 16px;
+      font-weight: 700;
+      color: var(--muted);
+      background: var(--surface-subtle);
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: #faf8ff;
+    }
+
+    .student-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .student-avatar-sm {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2563eb, #38bdf8);
+      color: #ffffff;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .pill.mint { background: var(--mint); color: var(--green); }
+    .pill.lavender { background: var(--lavender); color: var(--purple); }
+    .pill.gold { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+    .pill.blue { background: var(--blue-bg); color: var(--blue); }
+
+    /* Integration Platform Badges */
+    .platform-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+    .platform-tag.leetcode { background: #fff4e5; color: #b26a00; border: 1px solid #ffd599; }
+    .platform-tag.codeforces { background: #e6f4fc; color: #0c6999; border: 1px solid #a8daf5; }
+    .platform-tag.github { background: #f0f2f5; color: #24292e; border: 1px solid #d0d7de; }
+
+    /* Form & Input Groups */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: span 2;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface-subtle);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      font-weight: 500;
+      transition: all 0.15s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--purple);
+      background: white;
+      box-shadow: 0 0 0 3px var(--lavender);
+      outline: none;
+    }
+
+    /* Modal Sheet */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 12, 36, 0.55);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 580px;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Coding Hub Section Cards */
+    .coding-platform-card {
+      background: white;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .platform-header {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .platform-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .platform-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      color: white;
+      flex-shrink: 0;
+    }
+    .platform-logo.leetcode { background: #ffa116; }
+    .platform-logo.codeforces { background: #1f8acb; }
+    .platform-logo.github { background: #24292e; }
+
+    .platform-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #231b3b;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 30px;
+      font-size: 14px;
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 200;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .cms-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+      }
+      .cms-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(0,0,0,0.3);
+      }
+      .mobile-menu-btn {
+        display: block;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full {
+        grid-column: span 1;
+      }
+    /* File Upload & Live Sync Styles */
+    .file-dropzone {
+      border: 2px dashed var(--purple-light);
+      background: var(--surface-subtle);
+      border-radius: var(--radius-sm);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .file-dropzone:hover, .file-dropzone.dragover {
+      border-color: var(--purple);
+      background: var(--lavender);
+    }
+
+    .file-preview-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: white;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 10px;
+    }
+
+    .live-pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #1d7256;
+      box-shadow: 0 0 8px #1d7256;
+      display: inline-block;
+      animation: pulseDot 1.4s infinite ease-in-out;
+    }
+
+    </style>
+</head>
+
+<body>
+  <div class="toast" id="toast">
+    
+    <span id="toast-msg">Content saved!</span>
+  </div>
+
+  <div class="cms-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="cms-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-mark">
+          <div class="brand-orb" aria-hidden="true" style="border-radius: 6px; font-weight: 800; font-size: 11px; background: var(--purple); color: white;">XP</div>
+          <span>XPlore Faculty</span>
+        </div>
+        <span class="faculty-badge">CMS & Instructor Hub</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button type="button" class="nav-item active" data-tab="analytics">
+          
+          <span>Student Monitoring</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="content">
+          
+          <span>Course Modules</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="quizzes">
+          
+          <span>Quiz Manager</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="challenges">
+          
+          <span>Micro-Challenges</span>
+        </button>
+
+        <button type="button" class="nav-item" data-tab="coding">
+          
+          <span>Coding Platforms Hub</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="faculty-profile">
+          <div class="faculty-avatar" style="background: linear-gradient(135deg, #2563eb, #38bdf8); color: white; font-weight: 800; font-size: 13px; display: grid; place-items: center;">PS</div>
+          <div>
+            <div style="font-size: 13px; font-weight: 700;">Prof. Sterling</div>
+            <div style="font-size: 11px; color: var(--muted);">Faculty Lead</div>
+          </div>
+        </div>
+        <button type="button" class="action-btn secondary" id="faculty-logout-btn" style="padding: 6px 10px; font-size: 11px;" title="Log out of Faculty Console">
+          Lock Session
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Work Area -->
+    <div class="cms-main">
+      <header class="cms-topbar">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <button type="button" class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle menu">Menu</button>
+          <div>
+            <h1 class="topbar-title" id="page-title">Student Activity & Monitoring</h1>
+            <p style="font-size: 12px; color: var(--muted);">Real-time learning telemetry and curriculum controls</p>
+          </div>
+        </div>
+
+        <div class="topbar-actions" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="pill mint" id="cms-live-sync-pill" title="Live sync connected to student portal tabs">
+            <span class="live-pulse-dot"></span> <span>Live Sync: Broadcasting</span>
+          </div>
+          
+          <button type="button" class="action-btn" id="topbar-upload-material-btn" style="background: var(--purple); color: white; padding: 8px 14px; font-size: 12.5px;">
+            <span>+ Upload Material</span>
+          </button>
+          <button type="button" class="action-btn secondary" id="topbar-announcement-btn" style="padding: 8px 12px; font-size: 12.5px;">
+            <span>Broadcast Update</span>
+          </button>
+          <button type="button" class="action-btn secondary" id="export-report-btn" style="padding: 8px 12px; font-size: 12.5px;">
+            <span>Export Data</span>
+          </button>
+        </div>
+      </header>
+
+      <div class="cms-content">
+
+        <!-- ================= TAB 1: STUDENT MONITORING & ANALYTICS ================= -->
+        <section class="tab-section active" id="tab-analytics">
+          <!-- Class KPIs -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Active Cohort</span>
+                
+              </div>
+              <div class="metric-value">248</div>
+              <div class="metric-change positive">
+                <span>↑ 18 this week</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Avg Daily Time Spent</span>
+                
+              </div>
+              <div class="metric-value" id="kpi-avg-time">42.5 min</div>
+              <div class="metric-change positive">
+                <span>↑ 14% vs last week</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Labs &amp; Quizzes Solved</span>
+                
+              </div>
+              <div class="metric-value" id="kpi-questions-solved">3,892</div>
+              <div class="metric-change positive">
+                <span>94.2% accuracy</span>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-header">
+                <span>Course Assignments</span>
+                
+              </div>
+              <div class="metric-value">1,420</div>
+              <div class="metric-change neutral">
+                <span>All Batches Active</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Student Monitoring Table -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Live Student Telemetry Table</h2>
+                <p class="card-subtitle">Real-time metrics: Time on app, questions answered, and coding profiles</p>
+              </div>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="student-search-input" placeholder="Search student name or handle..." style="padding: 7px 12px; font-size: 12px; width: 220px;">
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Time on App (Today / Wk)</th>
+                    <th>Questions Solved</th>
+                    <th>Streak</th>
+                    <th>Current XP / Level</th>
+                    <th>Coding Handles</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="student-table-body">
+                  <!-- Populated by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Live Activity Stream -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Live Student Activity Stream</h2>
+                <p class="card-subtitle">Telemetry events streamed from student instances</p>
+              </div>
+              <span class="pill mint">● Live Feed</span>
+            </div>
+
+            <div id="activity-feed" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Populated by JavaScript -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 2: COURSE CONTENT MODULES & FILE UPLOADS ================= -->
+        <section class="tab-section" id="tab-content">
+          <!-- Live Materials & File Uploads Card -->
+          <div class="card" style="margin-bottom: 24px;">
+            <div class="card-header" style="flex-wrap: wrap; gap: 14px;">
+              <div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <h2 class="card-title">Live Study Materials & File Uploads</h2>
+                  <span class="pill mint"><span class="live-pulse-dot"></span> Instant Student Sync</span>
+                </div>
+                <p class="card-subtitle">Upload files (PDFs, code, docs) or web links. Items instantly push to all online students in real time.</p>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                
+                <button type="button" class="action-btn" id="open-upload-modal-btn" style="background: var(--purple); color: white;">
+                  + Upload Material / Document
+                </button>
+                <button type="button" class="action-btn secondary" id="open-announcement-modal-btn">
+                  Post Announcement
+                </button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Material Title</th>
+                    <th>Subject</th>
+                    <th>File / Link</th>
+                    <th>XP Reward</th>
+                    <th>Upload Time</th>
+                    <th>Status</th>
+                    <th>Live Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="materials-table-body">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Curriculum Modules Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Curriculum Modules & Lessons</h2>
+                <p class="card-subtitle">Course learning objectives and cohort progress tracks</p>
+              </div>
+              <button type="button" class="action-btn" id="create-module-btn">+ Create New Module</button>
+            </div>
+
+            <div id="modules-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+              <!-- Modules Cards Injected via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 3: QUIZ MANAGER ================= -->
+        <section class="tab-section" id="tab-quizzes">
+          <div class="card">
+            <div class="card-header" style="flex-wrap: wrap; gap: 14px;">
+              <div>
+                <h2 class="card-title">Daily Quizzes & Question Bank</h2>
+                <p class="card-subtitle">Create quizzes that immediately publish to student daily feed</p>
+              </div>
+              <div style="display: flex; gap: 10px;">
+                
+                <button type="button" class="action-btn secondary" id="new-quiz-modal-btn">+ Manual Quiz Form</button>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Quiz Title</th>
+                    <th>Category</th>
+                    <th>Questions Count</th>
+                    <th>XP Value</th>
+                    <th>Time Limit</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="quizzes-table-body">
+                  <!-- Populated via JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 4: MICRO-CHALLENGES MANAGER ================= -->
+        <section class="tab-section" id="tab-challenges">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">2-Minute Micro-Challenges</h2>
+                <p class="card-subtitle">Bite-sized problem challenges for daily momentum</p>
+              </div>
+              <button type="button" class="action-btn" id="new-challenge-btn">+ Add Micro-Challenge</button>
+            </div>
+
+            <div id="challenges-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px;">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= TAB 5: CODING PLATFORMS HUB (LEETCODE / CODEFORCES / GITHUB) ================= -->
+        <section class="tab-section" id="tab-coding">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">Coursework Assignments &amp; GitHub Project Hub</h2>
+                <p class="card-subtitle">Connect programming assignments and student repositories to learning progress tracks</p>
+              </div>
+              <button type="button" class="action-btn secondary" id="sync-coding-telemetry-btn">Refresh Telemetry Stream</button>
+            </div>
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 20px;">
+              Configure assignments from popular coding platforms. When students solve problems or submit code commits, their activity is automatically converted into XPlore XP and reflected in their profiles.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 24px;">
+
+              <!-- LeetCode Integration Box -->
+              <div class="coding-platform-card">
+                <div class="platform-header">
+                  <div class="platform-info">
+                    <div class="platform-logo leetcode" style="font-size: 10px; font-weight: 800; background: var(--lavender); color: var(--purple);">LEET</div>
+                    <div>
+                      <h3 style="font-size: 16px; font-weight: 700;">Weekly Programming Assignments</h3>
+                      <p style="font-size: 12px; color: var(--muted);">Track student acceptance, problem solve count, and weekly coursework tasks</p>
+                    </div>
+                  </div>
+                  <span class="pill mint">Active Integration</span>
+                </div>
+                <div class="platform-body">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Weekly LeetCode Assignment (Problem URL or Slug)</label>
+                      <input type="text" id="leetcode-slug-input" value="two-sum" placeholder="e.g. merge-intervals or https://leetcode.com/problems/...">
+                    </div>
+                    <div class="form-group">
+                      <label>Reward for Completion</label>
+                      <input type="number" id="leetcode-xp-input" value="80" placeholder="XP reward">
+                    </div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span class="small muted">Top student solver: <strong>Maya Chen (184 Solved)</strong></span>
+                    <button type="button" class="action-btn" id="publish-leetcode-task-btn">Publish to Student App</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Codeforces Integration Box -->
+              <div class="coding-platform-card">
+                <div class="platform-header">
+                  <div class="platform-info">
+                    <div class="platform-logo codeforces" style="font-size: 10px; font-weight: 800; background: var(--mint); color: var(--green);">CODE</div>
+                    <div>
+                      <h3 style="font-size: 16px; font-weight: 700;">Codeforces Contest & Rating Monitor</h3>
+                      <p style="font-size: 12px; color: var(--muted);">Track competitive ratings (Pupil, Specialist, Expert) and round standings</p>
+                    </div>
+                  </div>
+                  <span class="pill mint">Active Integration</span>
+                </div>
+                <div class="platform-body">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Target Contest Round ID</label>
+                      <input type="text" id="codeforces-round-input" value="Div. 3 Round 982" placeholder="e.g. Round 980 (Div. 2)">
+                    </div>
+                    <div class="form-group">
+                      <label>Contest Participation Bonus</label>
+                      <input type="number" id="codeforces-xp-input" value="120" placeholder="XP for taking contest">
+                    </div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span class="small muted">Highest Rating in Cohort: <strong>Alex Rivera (1,480 · Specialist)</strong></span>
+                    <button type="button" class="action-btn" id="publish-codeforces-task-btn">Set Active Round</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- GitHub Classroom & Commit Tracker -->
+              <div class="coding-platform-card">
+                <div class="platform-header">
+                  <div class="platform-info">
+                    <div class="platform-logo github" style="font-size: 10px; font-weight: 800; background: #e2e8f0; color: #1e293b;">GIT</div>
+                    <div>
+                      <h3 style="font-size: 16px; font-weight: 700;">GitHub Commits & Repository Tracker</h3>
+                      <p style="font-size: 12px; color: var(--muted);">Monitor daily commit streaks, pull requests, and project repo submissions</p>
+                    </div>
+                  </div>
+                  <span class="pill mint">Active Integration</span>
+                </div>
+                <div class="platform-body">
+                  <div class="form-grid">
+                    <div class="form-group">
+                      <label>Classroom Organization / Repo Template</label>
+                      <input type="text" id="github-repo-input" value="xplore-academy/data-structures-lab" placeholder="e.g. org/repo-template">
+                    </div>
+                    <div class="form-group">
+                      <label>Commit Streak Multiplier</label>
+                      <select id="github-multiplier-select">
+                        <option value="1.5">1.5x XP for 5+ Day Git Streak</option>
+                        <option value="2.0">2.0x XP for 7+ Day Git Streak</option>
+                        <option value="1.0">Standard 1.0x XP</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px;">
+                    <span class="small muted">Total commits this week: <strong>412 commits</strong> across 82 repos</span>
+                    <button type="button" class="action-btn" id="publish-github-task-btn">Update Repo Requirements</button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Create New Quiz -->
+  <div class="modal-overlay" id="quiz-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Publish New Daily Quiz</h2>
+        <button type="button" class="action-btn secondary" style="padding: 4px 10px;" id="close-quiz-modal">Close</button>
+      </div>
+
+      <form id="create-quiz-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label>Quiz Title</label>
+          <input type="text" id="quiz-title-input" placeholder="e.g. Data Structures & Algorithm Design" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="quiz-subject-select">
+              <option value="Computer Science" selected>Computer Science</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Physics">Physics</option>
+              <option value="Engineering">Engineering</option>
+              <option value="General Studies">General Studies</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>XP Reward</label>
+            <input type="number" id="quiz-xp-input" value="30" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Question 1 Text</label>
+          <input type="text" id="q1-text" placeholder="e.g. What is the derivative of the activation function?" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Option A (Correct Answer)</label>
+            <input type="text" id="q1-opt-a" placeholder="Option A" required>
+          </div>
+          <div class="form-group">
+            <label>Option B</label>
+            <input type="text" id="q1-opt-b" placeholder="Option B" required>
+          </div>
+          <div class="form-group">
+            <label>Option C</label>
+            <input type="text" id="q1-opt-c" placeholder="Option C" required>
+          </div>
+          <div class="form-group">
+            <label>Option D</label>
+            <input type="text" id="q1-opt-d" placeholder="Option D" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correct Answer</label>
+          <select id="q1-correct-select">
+            <option value="0">Option A</option>
+            <option value="1">Option B</option>
+            <option value="2">Option C</option>
+            <option value="3">Option D</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Educational Explanation / Fact</label>
+          <textarea id="q1-fact" rows="2" placeholder="Detailed explanation of why this answer is correct..."></textarea>
+        </div>
+
+        <div id="additional-questions-container" style="display: flex; flex-direction: column; gap: 14px;"></div>
+
+        <button type="button" class="action-btn secondary" id="add-quiz-q-btn" style="align-self: flex-start; font-size: 12px; padding: 6px 14px;">
+          + Add Another Question
+        </button>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="action-btn secondary" id="cancel-quiz-btn">Cancel</button>
+          <button type="submit" class="action-btn">Deploy Quiz to App</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Upload Course Material & File -->
+  <div class="modal-overlay" id="material-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Upload Course Material & Study Document</h2>
+          <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Files and resources uploaded here instantly appear on student screens.</p>
+        </div>
+        <button type="button" class="action-btn secondary" style="padding: 4px 10px;" id="close-material-modal">Close</button>
+      </div>
+
+      <form id="upload-material-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label>Material / Document Title</label>
+          <input type="text" id="mat-title-input" placeholder="e.g. Graph Traversal Algorithms & BFS/DFS Notes" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Subject</label>
+            <select id="mat-subject-select">
+              <option value="Computer Science" selected>Computer Science</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Physics">Physics</option>
+              <option value="Engineering">Engineering</option>
+              <option value="General Studies">General Studies</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>XP Reward for Studying</label>
+            <input type="number" id="mat-xp-input" value="25" min="10" max="100" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Upload Mode</label>
+          <div style="display: flex; gap: 10px;">
+            <label style="flex: 1; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13px; background: var(--surface-subtle); padding: 8px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); cursor: pointer;">
+              <input type="radio" name="mat-mode" value="file" checked style="width: auto;"> Document File Upload
+            </label>
+            <label style="flex: 1; display: flex; align-items: center; gap: 8px; font-weight: 500; font-size: 13px; background: var(--surface-subtle); padding: 8px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); cursor: pointer;">
+              <input type="radio" name="mat-mode" value="link" style="width: auto;"> Web Resource Link
+            </label>
+          </div>
+        </div>
+
+        <!-- File Upload Area -->
+        <div class="form-group" id="mat-file-area">
+          <label>Choose File (PDF, DOCX, Code, Slide, Image)</label>
+          <div class="file-dropzone" id="file-dropzone">
+            
+            <strong style="font-size: 13px;">Click to select file or drag & drop here</strong>
+            <span style="font-size: 11px; color: var(--muted);">Supports .pdf, .docx, .py, .java, .cpp, .js, .txt, .zip (Max 5MB)</span>
+            <input type="file" id="mat-file-input" style="display: none;" accept=".pdf,.doc,.docx,.txt,.md,.py,.js,.java,.cpp,.zip,.png,.jpg">
+          </div>
+          <div id="file-selected-card" class="file-preview-card" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              
+              <div>
+                <strong id="selected-file-name" style="font-size: 13px;">filename.pdf</strong>
+                <div id="selected-file-size" style="font-size: 11px; color: var(--muted);">120 KB</div>
+              </div>
+            </div>
+            <button type="button" class="action-btn secondary" style="padding: 3px 8px; font-size: 11px;" id="remove-file-btn">Remove</button>
+          </div>
+        </div>
+
+        <!-- Link Resource Area -->
+        <div class="form-group" id="mat-link-area" style="display: none;">
+          <label>Resource URL / Link</label>
+          <input type="url" id="mat-link-input" placeholder="https://github.com/... or https://docs.google.com/...">
+        </div>
+
+        <div class="form-group">
+          <label>Description & Study Instructions</label>
+          <textarea id="mat-desc-input" rows="3" placeholder="Key takeaways students should focus on while reading..." required></textarea>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px; background: var(--lavender); padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--lavender-border);">
+          <span class="live-pulse-dot"></span>
+          <span style="font-size: 12px; color: var(--purple-dark); font-weight: 600;">
+            Immediate Push: Uploading will trigger a real-time banner and sound chime on all active student portals.
+          </span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="action-btn secondary" id="cancel-material-btn">Cancel</button>
+          <button type="submit" class="action-btn" style="background: var(--purple); color: white;">Upload &amp; Publish to Students</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Instant Announcement Broadcast -->
+  <div class="modal-overlay" id="announcement-modal">
+    <div class="modal-card" style="max-width: 480px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Broadcast Course Announcement</h2>
+          <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Flash an urgent alert or bulletin on student screens.</p>
+        </div>
+        <button type="button" class="action-btn secondary" style="padding: 4px 10px;" id="close-announcement-modal">Close</button>
+      </div>
+
+      <form id="announcement-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label>Announcement Headline</label>
+          <input type="text" id="ann-title-input" placeholder="e.g. Tomorrow's Lab Relocated to Room 402" required>
+        </div>
+
+        <div class="form-group">
+          <label>Priority / Badge</label>
+          <select id="ann-priority-select">
+            <option value="Urgent Notice">Urgent Notice</option>
+            <option value="Class Update" selected>Class Update</option>
+            <option value="Quiz Reminder">Quiz Reminder</option>
+            <option value="Bonus Reward">Bonus Lab Opportunity</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="ann-message-input" rows="4" placeholder="Type the announcement to be displayed immediately on student dashboards..." required></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="action-btn secondary" id="cancel-announcement-btn">Cancel</button>
+          <button type="submit" class="action-btn" style="background: var(--purple); color: white;">Broadcast Announcement Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Add Micro-Challenge -->
+  <div class="modal-overlay" id="challenge-modal">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Create 2-Minute Micro-Challenge</h2>
+          <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Bite-sized problem challenge published to student daily feeds.</p>
+        </div>
+        <button type="button" class="action-btn secondary" style="padding: 4px 10px;" id="close-challenge-modal">Close</button>
+      </div>
+
+      <form id="create-challenge-form" style="display: flex; flex-direction: column; gap: 16px;">
+        <div class="form-group">
+          <label>Challenge Title</label>
+          <input type="text" id="ch-title-input" placeholder="e.g. Identify the Non-Parametric Model" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Category</label>
+            <select id="ch-category-select">
+              <option value="Computer Science" selected>Computer Science</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="Physics">Physics</option>
+              <option value="Engineering">Engineering</option>
+              <option value="General Studies">General Studies</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>XP Value</label>
+            <input type="number" id="ch-xp-input" value="40" min="10" max="100" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Question Prompt</label>
+          <input type="text" id="ch-q-input" placeholder="e.g. Which technique minimizes expected validation error under high variance?" required>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Option A</label>
+            <input type="text" id="ch-opt-a" placeholder="Option A" required>
+          </div>
+          <div class="form-group">
+            <label>Option B</label>
+            <input type="text" id="ch-opt-b" placeholder="Option B" required>
+          </div>
+          <div class="form-group">
+            <label>Option C</label>
+            <input type="text" id="ch-opt-c" placeholder="Option C" required>
+          </div>
+          <div class="form-group">
+            <label>Option D</label>
+            <input type="text" id="ch-opt-d" placeholder="Option D" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correct Option</label>
+          <select id="ch-correct-select">
+            <option value="0">Option A</option>
+            <option value="1" selected>Option B</option>
+            <option value="2">Option C</option>
+            <option value="3">Option D</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Brief Description / Context</label>
+          <input type="text" id="ch-desc-input" placeholder="Identify regularizer assumptions and capacity limits." required>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="action-btn secondary" id="cancel-challenge-btn">Cancel</button>
+          <button type="submit" class="action-btn" style="background: var(--purple); color: white;">Deploy Concept Check</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="faculty-auth-gate" style="background: rgba(14, 9, 28, 0.88); backdrop-filter: blur(16px); z-index: 500;">
+    <div class="modal-card" style="max-width: 440px; text-align: center; border: 1.5px solid var(--border); box-shadow: var(--shadow-lg);">
+      <div style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #38bdf8); display: grid; place-items: center; color: white; font-size: 28px; margin: 0 auto 16px; box-shadow: 0 6px 18px rgba(37, 99, 235, 0.4);">
+        PS
+      </div>
+      <span class="pill lavender" style="font-size: 11px; margin-bottom: 8px;">Staff &amp; Instructors Only</span>
+      <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 6px;">XPlore Faculty Console</h2>
+      <p style="font-size: 13px; color: var(--muted); margin-bottom: 22px;">
+        Restricted area. Please authenticate to manage quizzes, view student telemetry, and configure coding assignments.
+      </p>
+
+      <form id="faculty-login-form" style="display: flex; flex-direction: column; gap: 14px; text-align: left;">
+        <div class="form-group">
+          <label>Faculty Email</label>
+          <input type="email" id="faculty-email-input" value="prof.sterling@xplore.edu" required placeholder="instructor@school.edu">
+        </div>
+        <div class="form-group">
+          <label>Security Key / Passcode</label>
+          <input type="password" id="faculty-pass-input" placeholder="Enter faculty passcode" required autocomplete="current-password">
+          <span style="font-size: 11px; color: var(--muted);">Default handover key: <code style="background:#eee; padding:2px 4px; border-radius:4px; font-weight:bold;">faculty2026</code></span>
+        </div>
+
+        <div id="faculty-auth-error" style="display: none; padding: 10px; background: var(--red-bg); color: var(--red); border-radius: 8px; font-size: 12px; font-weight: 600;">
+          Invalid passcode. Please enter the authorized faculty security key.
+        </div>
+
+        <button type="submit" class="action-btn" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px; margin-top: 4px;">
+          Unlock Faculty Console →
+        </button>
+      </form>
+
+      <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
+        <button type="button" class="action-btn secondary" style="width: 100%; justify-content: center; font-size: 12px;" id="quick-demo-faculty-btn">
+          One-Click Faculty Demo Login
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // One-time reset to ensure zero pre-baked demo content exists in browser cache
+    (function purgeStaleDemoData() {
+      const CURRENT_VERSION = "xplore_clean_empty_v5";
+      if (localStorage.getItem("xplore_version") !== CURRENT_VERSION) {
+        localStorage.removeItem("xplore_cms_quizzes");
+        localStorage.removeItem("xplore_cms_materials");
+        localStorage.removeItem("xplore_cms_challenges");
+        localStorage.removeItem("xplore_cms_announcements");
+        localStorage.removeItem("xplore_cms_activities");
+        localStorage.removeItem("xplore_active_quiz");
+        localStorage.removeItem("xplore_last_broadcast");
+        localStorage.removeItem("orbit_cms_quizzes");
+        localStorage.removeItem("orbit_cms_materials");
+        localStorage.removeItem("xplore_merged_state");
+        localStorage.removeItem("orbit_merged_state");
+        localStorage.setItem("xplore_version", CURRENT_VERSION);
+      }
+    })();
+
+    /* ================= 1. SAMPLE DATA & PERSISTENT CMS STATE ================= */
+    const defaultStudents = [
+      {
+        id: "maya-chen",
+        name: "Maya Chen",
+        avatar: "MC",
+        grade: "Student Cohort",
+        timeToday: "0 min",
+        timeWeek: "0m",
+        questionsSolved: 0,
+        accuracy: "--",
+        streak: 1,
+        xp: 0,
+        lastActive: "Just now",
+        status: "Active",
+        leetcode: "maya_c",
+        cfHandle: "mayac_ai",
+        github: "mayachen-lab"
+      },
+      {
+        id: "alex-rivera",
+        name: "Alex Rivera",
+        avatar: "AR",
+        grade: "Student Cohort",
+        timeToday: "0 min",
+        timeWeek: "0m",
+        questionsSolved: 0,
+        accuracy: "--",
+        streak: 1,
+        xp: 0,
+        lastActive: "15 min ago",
+        status: "Idle",
+        leetcode: "arivera_dev",
+        cfHandle: "arivera_master",
+        github: "arivera-dev"
+      },
+      {
+        id: "liam-patel",
+        name: "Liam Patel",
+        avatar: "LP",
+        grade: "Student Cohort",
+        timeToday: "0 min",
+        timeWeek: "0m",
+        questionsSolved: 0,
+        accuracy: "--",
+        streak: 1,
+        xp: 0,
+        lastActive: "1 hour ago",
+        status: "Idle",
+        leetcode: "liam_p",
+        cfHandle: "liamp_expert",
+        github: "liampatel-lab"
+      },
+      {
+        id: "sophia-wang",
+        name: "Sophia Wang",
+        avatar: "SW",
+        grade: "Student Cohort",
+        timeToday: "0 min",
+        timeWeek: "0m",
+        questionsSolved: 0,
+        accuracy: "--",
+        streak: 1,
+        xp: 0,
+        lastActive: "Yesterday",
+        status: "Offline",
+        leetcode: "sophia_w",
+        cfHandle: "sophiaw_cf",
+        github: "sophiawang-core"
+      }
+    ];
+
+    const defaultQuizzes = [];
+    const defaultChallenges = [];
+    const defaultMaterials = [];
+    const defaultAnnouncements = [];
+
+    function getInitialCMSData(key, fallback) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed;
+        }
+      } catch (e) {}
+      localStorage.setItem(key, JSON.stringify(fallback));
+      return fallback;
+    }
+
+    let students = getInitialCMSData("xplore_cms_students", defaultStudents);
+    let quizzes = getInitialCMSData("xplore_cms_quizzes", defaultQuizzes);
+    let challenges = getInitialCMSData("xplore_cms_challenges", defaultChallenges);
+    let materials = getInitialCMSData("xplore_cms_materials", defaultMaterials);
+    let announcements = getInitialCMSData("xplore_cms_announcements", defaultAnnouncements);
+    let activities = getInitialCMSData("xplore_cms_activities", []);
+
+    function saveCMSData() {
+      localStorage.setItem("xplore_cms_students", JSON.stringify(students));
+      localStorage.setItem("xplore_cms_quizzes", JSON.stringify(quizzes));
+      localStorage.setItem("xplore_cms_challenges", JSON.stringify(challenges));
+      localStorage.setItem("xplore_cms_materials", JSON.stringify(materials));
+      localStorage.setItem("xplore_cms_announcements", JSON.stringify(announcements));
+      localStorage.setItem("orbit_cms_quizzes", JSON.stringify(quizzes));
+      localStorage.setItem("xplore_cms_activities", JSON.stringify(activities));
+    }
+
+    /* ================= LIVE SYNC BROADCASTER ================= */
+    function broadcastToStudents(payload) {
+      payload.timestamp = Date.now();
+      try {
+        const channel = new BroadcastChannel("xplore_live_sync");
+        channel.postMessage(payload);
+      } catch (e) {}
+      try {
+        localStorage.setItem("xplore_last_broadcast", JSON.stringify(payload));
+      } catch (e) {}
+    }
+
+    /* ================= 2. TOAST SYSTEM ================= */
+    function showToast(msg, icon = "") {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-msg").textContent = msg;
+      const iconEl = document.getElementById("toast-icon"); if (iconEl) iconEl.textContent = icon;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2800);
+    }
+
+    /* ================= 3. RENDER TELEMETRY TABLE ================= */
+    function renderStudentTable(filterText = "") {
+      const tbody = document.getElementById("student-table-body");
+      tbody.innerHTML = "";
+
+      const filtered = students.filter(s =>
+        s.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        s.leetcode.toLowerCase().includes(filterText.toLowerCase()) ||
+        s.github.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      filtered.forEach(s => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div class="student-cell">
+              <div class="student-avatar-sm">${s.avatar}</div>
+              <div>
+                <strong style="color: var(--text);">${s.name}</strong>
+                <div style="font-size: 11px; color: var(--muted);">${s.grade}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong>${s.timeToday}</strong>
+            <div style="font-size: 11px; color: var(--muted);">${s.timeWeek} this wk</div>
+          </td>
+          <td>
+            <strong style="color: var(--green);">${s.questionsSolved} solved</strong>
+            <div style="font-size: 11px; color: var(--muted);">${s.accuracy} accuracy</div>
+          </td>
+          <td>
+            <span class="pill gold">${s.streak}d Streak</span>
+          </td>
+          <td>
+            <strong>${s.xp.toLocaleString()} XP</strong>
+            <div style="font-size: 11px; color: var(--purple);">Level ${s.level}</div>
+          </td>
+          <td>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <span class="platform-tag leetcode">LC: ${s.leetcode}</span>
+              <span class="platform-tag codeforces">CF: ${s.codeforces}</span>
+              <span class="platform-tag github">GH: ${s.github}</span>
+            </div>
+          </td>
+          <td>
+            <span class="pill mint" style="font-size: 10px;">${s.status}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Student Search filter
+    document.getElementById("student-search-input").addEventListener("input", (e) => {
+      renderStudentTable(e.target.value);
+    });
+
+    /* ================= 4. RENDER ACTIVITY FEED ================= */
+    
+    /* ================= LIVE STUDENT SUBMISSION TELEMETRY RECEIVER ================= */
+    function initCMSLiveSync() {
+      try {
+        const channel = new BroadcastChannel("xplore_live_sync");
+        channel.onmessage = (event) => {
+          const data = event.data;
+          if (!data || !data.type) return;
+
+          if (data.type === "STUDENT_QUIZ_COMPLETED") {
+            const isPassed = data.passed !== false && data.xp > 0;
+            const submission = {
+              time: "Just now",
+              student: data.student || "Maya Chen",
+              event: isPassed 
+                ? `Passed Quiz '${data.quizTitle || 'Daily Quiz'}' (${data.score}/${data.total} correct, ${data.accuracy || ''}) +${data.xp} XP`
+                : `Attempted Quiz '${data.quizTitle || 'Daily Quiz'}' (${data.score}/${data.total} correct, ${data.accuracy || ''}) - Below 75% Gate (0 XP)`,
+              badge: isPassed ? "Passed" : "Unsatisfactory"
+            };
+            activities.unshift(submission);
+            if (activities.length > 25) activities.pop();
+            saveCMSData();
+            renderActivityFeed();
+
+            // Update student record
+            const studentObj = students.find(s => s.name === (data.student || "Maya Chen"));
+            if (studentObj) {
+              studentObj.questionsSolved = (studentObj.questionsSolved || 0) + (data.total || 1);
+              studentObj.xp = (studentObj.xp || 0) + (data.xp || 60);
+              studentObj.accuracy = Math.round((data.score / (data.total || 1)) * 100) + "%";
+              studentObj.lastActive = "Just now";
+              studentObj.status = "Active";
+              saveCMSData();
+              renderStudentTable();
+            }
+
+            showToast(`Student Submission: ${data.student} scored ${data.score}/${data.total} on '${data.quizTitle}'`);
+          } else if (data.type === "STUDENT_CHALLENGE_COMPLETED") {
+            const submission = {
+              time: "Just now",
+              student: data.student || "Maya Chen",
+              event: `Completed Concept Check '${data.challengeTitle || 'Micro-Challenge'}' (+${data.xp || 40} XP)`,
+              badge: "Challenge"
+            };
+            activities.unshift(submission);
+            if (activities.length > 25) activities.pop();
+            saveCMSData();
+            renderActivityFeed();
+
+            const studentObj = students.find(s => s.name === (data.student || "Maya Chen"));
+            if (studentObj) {
+              studentObj.questionsSolved = (studentObj.questionsSolved || 0) + 1;
+              studentObj.xp = (studentObj.xp || 0) + (data.xp || 40);
+              studentObj.lastActive = "Just now";
+              studentObj.status = "Active";
+              saveCMSData();
+              renderStudentTable();
+            }
+
+            showToast(`Concept Check Solved: ${data.student} earned +${data.xp} XP`);
+          }
+        };
+      } catch (e) {}
+    }
+
+    function renderActivityFeed() {
+      const feed = document.getElementById("activity-feed");
+      if (!feed) return;
+
+      if (!activities || activities.length === 0) {
+        feed.innerHTML = `
+          <div style="text-align: center; padding: 28px 16px; color: var(--muted); background: var(--surface-subtle); border-radius: 12px; border: 1.5px dashed var(--border);">
+            
+            <strong style="font-size: 13px; color: var(--text);">No Student Submissions Yet</strong>
+            <p style="font-size: 11px; margin-top: 4px; color: var(--muted);">Live telemetry will stream here in realtime as enrolled students submit quizzes and concept checks.</p>
+          </div>
+        `;
+        return;
+      }
+
+      feed.innerHTML = activities.map(a => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: var(--surface-subtle); border-radius: 12px; border: 1px solid var(--border);">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <span class="pill lavender" style="font-size: 10px;">${a.badge || 'Activity'}</span>
+            <div>
+              <strong style="font-size: 13px;">${a.student}</strong>
+              <div style="font-size: 12px; color: var(--muted);">${a.event}</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; color: var(--muted);">${a.time}</span>
+        </div>
+      `).join("");
+    }
+
+    /* ================= 5. RENDER QUIZZES TABLE ================= */
+    function renderQuizzesTable() {
+      const tbody = document.getElementById("quizzes-table-body");
+      if (quizzes.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 36px 16px; color: var(--muted);">
+              
+              <strong style="font-size: 15px; color: var(--text);">No Quizzes Published Yet</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--muted);">Click <strong>"+ Add Daily Quiz"</strong> above to create and deploy quizzes to students.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = quizzes.map(q => `
+        <tr>
+          <td><strong>${q.title}</strong></td>
+          <td><span class="pill lavender">${q.subject}</span></td>
+          <td>${q.qCount || (q.questions ? q.questions.length : 1)} questions</td>
+          <td><strong style="color: var(--purple);">+${q.xp} XP</strong></td>
+          <td>${q.time || '3 min'}</td>
+          <td>
+            <span class="pill ${q.active ? 'mint' : 'gray'}">${q.active ? '● Live on App' : '○ Draft'}</span>
+          </td>
+          <td>
+            <button type="button" class="action-btn secondary" style="padding: 5px 10px; font-size: 11px;" onclick="toggleQuizStatus('${q.id}')">
+              ${q.active ? 'Deactivate' : 'Publish'}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    window.toggleQuizStatus = function(id) {
+      const q = quizzes.find(x => x.id === id);
+      if (q) {
+        q.active = !q.active;
+        saveCMSData();
+        renderQuizzesTable();
+        broadcastToStudents({
+          type: "QUIZ_STATUS_CHANGED",
+          id: q.id,
+          active: q.active,
+          title: q.title,
+          xp: q.xp
+        });
+        showToast(`Quiz '${q.title}' is now ${q.active ? 'Live on Student App' : 'Hidden'}!`);
+      }
+    };
+
+    /* ================= 5.5 RENDER MATERIALS TABLE ================= */
+    function renderMaterialsTable() {
+      const tbody = document.getElementById("materials-table-body");
+      if (!tbody) return;
+
+      if (materials.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 32px 16px; color: var(--muted);">
+              
+              <strong style="font-size: 14px; color: var(--text);">No Course Materials Uploaded Yet</strong>
+              <p style="font-size: 12px; margin-top: 4px; color: var(--muted);">Click <strong>"+ Upload Material / Document"</strong> above to push study notes or files to students.</p>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = materials.map(m => {
+        const icon = (m.type || 'DOC').toUpperCase();
+        const fileInfo = m.fileName ? `${m.fileName} ${m.fileSize ? `(${m.fileSize})` : ''}` : (m.linkUrl ? `Web Link` : 'Text Note');
+        return `
+          <tr>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 22px;">${icon}</span>
+                <div>
+                  <strong style="color: var(--text);">${m.title}</strong>
+                  <div style="font-size: 11px; color: var(--muted);">${m.desc ? m.desc.substring(0, 48) + '...' : ''}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="pill lavender">${m.subject || 'General'}</span></td>
+            <td><span style="font-family: monospace; font-size: 11px; color: var(--muted);">${fileInfo}</span></td>
+            <td><strong style="color: var(--purple);">+${m.xp || 25} XP</strong></td>
+            <td><span style="font-size: 12px; color: var(--muted);">${m.date || 'Today'}</span></td>
+            <td>
+              <span class="pill mint"><span class="live-pulse-dot"></span> Live on App</span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="action-btn secondary" style="padding: 4px 8px; font-size: 11px;" onclick="rebroadcastMaterial('${m.id}')" title="Re-send push alert to all connected students">
+                  Re-Push
+                </button>
+                <button type="button" class="action-btn secondary" style="padding: 4px 8px; font-size: 11px; color: var(--red);" onclick="deleteMaterial('${m.id}')" title="Delete Material">
+                  Delete
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    window.rebroadcastMaterial = function(id) {
+      const m = materials.find(x => x.id === id);
+      if (m) {
+        broadcastToStudents({ type: "MATERIAL_UPLOADED", material: m });
+        showToast(`Re-broadcasted '${m.title}' to student portals!`);
+      }
+    };
+
+    window.deleteMaterial = function(id) {
+      materials = materials.filter(x => x.id !== id);
+      saveCMSData();
+      renderMaterialsTable();
+      broadcastToStudents({ type: "MATERIAL_DELETED", id });
+      showToast("Material removed from cohort feed.");
+    };
+
+    /* ================= 6. RENDER MICRO-CHALLENGES ================= */
+    function renderChallenges() {
+      const grid = document.getElementById("challenges-grid");
+      grid.innerHTML = challenges.map(c => `
+        <div class="card" style="padding: 18px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <span class="pill gold">${c.category}</span>
+            <strong style="color: var(--purple);">+${c.xp} XP</strong>
+          </div>
+          <h3 style="font-size: 15px; margin-bottom: 6px;">${c.title}</h3>
+          <p style="font-size: 12px; color: var(--muted); margin-bottom: 14px;">${c.desc}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 10px;">
+            <span style="font-size: 11px; color: var(--muted);">${c.timeLimit}</span>
+            <span class="pill mint" style="font-size: 10px;">Active on Today</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    /* ================= 7. RENDER COURSE MODULES ================= */
+    function renderModules() {
+      const list = document.getElementById("modules-list");
+      const modules = [
+        { title: "Module 1: Computational Thinking & Algorithmic Design", lessons: 8, progress: "100% Cohort Started", status: "Active" },
+        { title: "Module 2: Binary Search & Spatial Algorithms", lessons: 6, progress: "84% Completion", status: "Active" },
+        { title: "Module 3: Codeforces Competitive Strategy", lessons: 4, progress: "62% Completion", status: "Upcoming" }
+      ];
+
+      list.innerHTML = modules.map(m => `
+        <div class="card" style="padding: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <span class="pill lavender">${m.lessons} Lessons</span>
+            <span class="pill mint">${m.status}</span>
+          </div>
+          <h3 style="font-size: 16px; margin-bottom: 8px;">${m.title}</h3>
+          <p style="font-size: 12px; color: var(--muted); margin-bottom: 16px;">Cohorts enrolled: Grade 10 Astrophysics & CS Foundations</p>
+          <div style="font-size: 12px; font-weight: 700; color: var(--purple);">${m.progress}</div>
+        </div>
+      `).join("");
+    }
+
+    /* ================= 8. TAB NAVIGATION ================= */
+    const navItems = document.querySelectorAll(".nav-item");
+    const tabSections = document.querySelectorAll(".tab-section");
+    const pageTitle = document.getElementById("page-title");
+
+    const tabTitles = {
+      analytics: "Student Activity & Telemetry",
+      content: "Curriculum Modules & Materials",
+      quizzes: "Daily Quiz Creator & Questions Bank",
+      challenges: "2-Minute Micro-Challenges",
+      coding: "LeetCode, Codeforces & GitHub Integrations"
+    };
+
+    navItems.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+        navItems.forEach(b => b.classList.toggle("active", b === btn));
+        tabSections.forEach(s => s.classList.toggle("active", s.id === `tab-${target}`));
+        pageTitle.textContent = tabTitles[target] || "Faculty CMS";
+
+        // Mobile sidebar close on pick
+        document.getElementById("sidebar").classList.remove("open");
+      });
+    });
+
+    // Mobile sidebar toggle
+    document.getElementById("mobile-toggle").addEventListener("click", () => {
+      document.getElementById("sidebar").classList.toggle("open");
+    });
+
+    /* ================= 9. NEW QUIZ MODAL FLOW ================= */
+    const quizModal = document.getElementById("quiz-modal");
+    document.getElementById("new-quiz-modal-btn").addEventListener("click", () => {
+      quizModal.classList.add("active");
+    });
+    document.getElementById("close-quiz-modal").addEventListener("click", () => {
+      quizModal.classList.remove("active");
+    });
+    document.getElementById("cancel-quiz-btn").addEventListener("click", () => {
+      quizModal.classList.remove("active");
+    });
+
+    
+    let extraQuestionCount = 1;
+    document.getElementById("add-quiz-q-btn")?.addEventListener("click", () => {
+      extraQuestionCount++;
+      const container = document.getElementById("additional-questions-container");
+      const qDiv = document.createElement("div");
+      qDiv.className = "extra-question-block";
+      qDiv.style.borderTop = "1px solid var(--border)";
+      qDiv.style.paddingTop = "12px";
+      qDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <label style="font-weight: 700; font-size: 13px;">Question ${extraQuestionCount} Text</label>
+          <button type="button" class="action-btn secondary" style="padding: 2px 8px; font-size: 11px; color: var(--red);" onclick="this.closest('.extra-question-block').remove()">Remove</button>
+        </div>
+        <input type="text" class="extra-q-text" placeholder="Enter question text..." required style="margin-bottom: 10px;">
+        <div class="form-grid">
+          <div class="form-group"><label>Option A</label><input type="text" class="extra-opt-a" placeholder="Option A" required></div>
+          <div class="form-group"><label>Option B</label><input type="text" class="extra-opt-b" placeholder="Option B" required></div>
+          <div class="form-group"><label>Option C</label><input type="text" class="extra-opt-c" placeholder="Option C" required></div>
+          <div class="form-group"><label>Option D</label><input type="text" class="extra-opt-d" placeholder="Option D" required></div>
+        </div>
+        <div class="form-group" style="margin-top: 8px;">
+          <label>Correct Answer</label>
+          <select class="extra-correct-select">
+            <option value="0">Option A</option>
+            <option value="1">Option B</option>
+            <option value="2">Option C</option>
+            <option value="3">Option D</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Explanation / Solution Note</label>
+          <textarea class="extra-q-fact" rows="2" placeholder="Explanation of the correct answer..."></textarea>
+        </div>
+      `;
+      container.appendChild(qDiv);
+    });
+
+    document.getElementById("create-quiz-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("quiz-title-input").value.trim();
+      const subject = document.getElementById("quiz-subject-select").value;
+      const xp = parseInt(document.getElementById("quiz-xp-input").value) || 30;
+      const answer = parseInt(document.getElementById("q1-correct-select").value) || 0;
+
+      const allQuestions = [
+        {
+          q: document.getElementById("q1-text").value.trim(),
+          options: [
+            document.getElementById("q1-opt-a").value.trim(),
+            document.getElementById("q1-opt-b").value.trim(),
+            document.getElementById("q1-opt-c").value.trim(),
+            document.getElementById("q1-opt-d").value.trim()
+          ],
+          answer: answer,
+          fact: document.getElementById("q1-fact").value.trim()
+        }
+      ];
+
+      document.querySelectorAll(".extra-question-block").forEach(block => {
+        const qText = block.querySelector(".extra-q-text")?.value.trim();
+        if (qText) {
+          allQuestions.push({
+            q: qText,
+            options: [
+              block.querySelector(".extra-opt-a")?.value.trim() || "Option A",
+              block.querySelector(".extra-opt-b")?.value.trim() || "Option B",
+              block.querySelector(".extra-opt-c")?.value.trim() || "Option C",
+              block.querySelector(".extra-opt-d")?.value.trim() || "Option D"
+            ],
+            answer: parseInt(block.querySelector(".extra-correct-select")?.value) || 0,
+            fact: block.querySelector(".extra-q-fact")?.value.trim() || ""
+          });
+        }
+      });
+
+      const newQuiz = {
+        id: "quiz-" + Date.now(),
+        title: title,
+        subject: subject,
+        qCount: allQuestions.length,
+        xp: xp,
+        time: `${allQuestions.length * 2} min`,
+        active: true,
+        questions: allQuestions
+      };
+
+      quizzes.unshift(newQuiz);
+      saveCMSData();
+      renderQuizzesTable();
+      quizModal.classList.remove("active");
+      broadcastToStudents({
+        type: "QUIZ_PUBLISHED",
+        title: title,
+        xp: xp,
+        count: 1,
+        quiz: newQuiz
+      });
+      showToast(`Quiz '${title}' deployed to student app!`);
+    });
+
+    /* ================= 9.5 MATERIAL UPLOAD & ANNOUNCEMENT MODAL FLOWS ================= */
+    const materialModal = document.getElementById("material-modal");
+    const openMatBtn1 = document.getElementById("open-upload-modal-btn");
+    const openMatBtn2 = document.getElementById("topbar-upload-material-btn");
+    const closeMatBtn = document.getElementById("close-material-modal");
+    const cancelMatBtn = document.getElementById("cancel-material-btn");
+
+    if (openMatBtn1) openMatBtn1.addEventListener("click", () => materialModal.classList.add("active"));
+    if (openMatBtn2) openMatBtn2.addEventListener("click", () => materialModal.classList.add("active"));
+    if (closeMatBtn) closeMatBtn.addEventListener("click", () => materialModal.classList.remove("active"));
+    if (cancelMatBtn) cancelMatBtn.addEventListener("click", () => materialModal.classList.remove("active"));
+
+    // File input & Drag-and-Drop handling
+    let selectedFileData = null;
+    let selectedFileName = "";
+    let selectedFileSize = "";
+    let selectedFileType = "pdf";
+
+    const fileInput = document.getElementById("mat-file-input");
+    const dropzone = document.getElementById("file-dropzone");
+    const fileCard = document.getElementById("file-selected-card");
+    const fileNameEl = document.getElementById("selected-file-name");
+    const fileSizeEl = document.getElementById("selected-file-size");
+    const fileIconEl = document.getElementById("selected-file-icon");
+
+    if (dropzone && fileInput) {
+      dropzone.addEventListener("click", () => fileInput.click());
+      dropzone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropzone.classList.add("dragover");
+      });
+      dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+      dropzone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropzone.classList.remove("dragover");
+        if (e.dataTransfer.files.length > 0) {
+          processSelectedFile(e.dataTransfer.files[0]);
+        }
+      });
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) {
+          processSelectedFile(e.target.files[0]);
+        }
+      });
+    }
+
+    function processSelectedFile(file) {
+      if (!file) return;
+      selectedFileName = file.name;
+      selectedFileSize = (file.size / 1024 < 1000) ? (file.size / 1024).toFixed(1) + " KB" : (file.size / (1024*1024)).toFixed(2) + " MB";
+
+      const ext = file.name.split('.').pop().toLowerCase();
+      selectedFileType = ['py', 'js', 'java', 'cpp', 'html', 'css', 'json'].includes(ext) ? 'code' : (ext === 'pdf' ? 'pdf' : 'doc');
+
+      if (fileNameEl) fileNameEl.textContent = selectedFileName;
+      if (fileSizeEl) fileSizeEl.textContent = selectedFileSize;
+      if (fileIconEl) fileIconEl.textContent = selectedFileType.toUpperCase();
+
+      if (fileCard) fileCard.style.display = "flex";
+      if (dropzone) dropzone.style.display = "none";
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        selectedFileData = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    const removeFileBtn = document.getElementById("remove-file-btn");
+    if (removeFileBtn) {
+      removeFileBtn.addEventListener("click", () => {
+        selectedFileData = null;
+        selectedFileName = "";
+        selectedFileSize = "";
+        if (fileInput) fileInput.value = "";
+        if (fileCard) fileCard.style.display = "none";
+        if (dropzone) dropzone.style.display = "flex";
+      });
+    }
+
+    // Radio switch between File and Link
+    document.querySelectorAll("input[name='mat-mode']").forEach(radio => {
+      radio.addEventListener("change", (e) => {
+        const isFile = e.target.value === "file";
+        const fileArea = document.getElementById("mat-file-area");
+        const linkArea = document.getElementById("mat-link-area");
+        if (fileArea) fileArea.style.display = isFile ? "block" : "none";
+        if (linkArea) linkArea.style.display = isFile ? "none" : "block";
+      });
+    });
+
+    // Material upload form submission
+    document.getElementById("upload-material-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("mat-title-input").value.trim();
+      const subject = document.getElementById("mat-subject-select").value;
+      const xp = parseInt(document.getElementById("mat-xp-input").value) || 25;
+      const desc = document.getElementById("mat-desc-input").value.trim();
+      const mode = document.querySelector("input[name='mat-mode']:checked").value;
+      const linkUrl = document.getElementById("mat-link-input").value.trim();
+
+      const newMaterial = {
+        id: "mat-" + Date.now(),
+        title: title,
+        subject: subject,
+        desc: desc,
+        type: mode === "file" ? selectedFileType : "link",
+        fileName: mode === "file" ? (selectedFileName || "Class_Resource.pdf") : "",
+        fileDataUrl: mode === "file" ? selectedFileData : null,
+        fileSize: mode === "file" ? (selectedFileSize || "150 KB") : "",
+        linkUrl: mode === "link" ? linkUrl : "",
+        xp: xp,
+        author: "Prof. Sterling",
+        date: "Today, " + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        studied: false
+      };
+
+      materials.unshift(newMaterial);
+      saveCMSData();
+      renderMaterialsTable();
+      materialModal.classList.remove("active");
+
+      // Broadcast immediately to online student portals!
+      broadcastToStudents({
+        type: "MATERIAL_UPLOADED",
+        material: newMaterial
+      });
+
+      showToast(` '${title}' uploaded & beamed live to Student Portal!`);
+
+      // Reset form
+      document.getElementById("upload-material-form").reset();
+      selectedFileData = null;
+      selectedFileName = "";
+      selectedFileSize = "";
+      if (fileCard) fileCard.style.display = "none";
+      if (dropzone) dropzone.style.display = "flex";
+    });
+
+    // Announcement Modal flows
+    const announcementModal = document.getElementById("announcement-modal");
+    const openAnnBtn1 = document.getElementById("open-announcement-modal-btn");
+    const openAnnBtn2 = document.getElementById("topbar-announcement-btn");
+    const closeAnnBtn = document.getElementById("close-announcement-modal");
+    const cancelAnnBtn = document.getElementById("cancel-announcement-btn");
+
+    if (openAnnBtn1) openAnnBtn1.addEventListener("click", () => announcementModal.classList.add("active"));
+    if (openAnnBtn2) openAnnBtn2.addEventListener("click", () => announcementModal.classList.add("active"));
+    if (closeAnnBtn) closeAnnBtn.addEventListener("click", () => announcementModal.classList.remove("active"));
+    if (cancelAnnBtn) cancelAnnBtn.addEventListener("click", () => announcementModal.classList.remove("active"));
+
+    document.getElementById("announcement-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("ann-title-input").value.trim();
+      const priority = document.getElementById("ann-priority-select").value;
+      const message = document.getElementById("ann-message-input").value.trim();
+
+      const newAnnouncement = {
+        id: "ann-" + Date.now(),
+        title: title,
+        priority: priority,
+        message: message,
+        author: "Prof. Sterling",
+        createdAt: Date.now()
+      };
+
+      announcements.unshift(newAnnouncement);
+      saveCMSData();
+      announcementModal.classList.remove("active");
+
+      broadcastToStudents({
+        type: "ANNOUNCEMENT_POSTED",
+        announcement: newAnnouncement
+      });
+
+      showToast(` Announcement '${title}' flashed to all students!`);
+      document.getElementById("announcement-form").reset();
+    });
+
+    // Challenge Modal flows
+    const challengeModal = document.getElementById("challenge-modal");
+    const openChBtn = document.getElementById("new-challenge-btn");
+    const closeChBtn = document.getElementById("close-challenge-modal");
+    const cancelChBtn = document.getElementById("cancel-challenge-btn");
+
+    if (openChBtn) openChBtn.addEventListener("click", () => challengeModal.classList.add("active"));
+    if (closeChBtn) closeChBtn.addEventListener("click", () => challengeModal.classList.remove("active"));
+    if (cancelChBtn) cancelChBtn.addEventListener("click", () => challengeModal.classList.remove("active"));
+
+    document.getElementById("create-challenge-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("ch-title-input").value.trim();
+      const category = document.getElementById("ch-category-select").value;
+      const xp = parseInt(document.getElementById("ch-xp-input").value) || 40;
+      const q = document.getElementById("ch-q-input").value.trim();
+      const optA = document.getElementById("ch-opt-a").value.trim();
+      const optB = document.getElementById("ch-opt-b").value.trim();
+      const optC = document.getElementById("ch-opt-c").value.trim();
+      const optD = document.getElementById("ch-opt-d").value.trim();
+      const answer = parseInt(document.getElementById("ch-correct-select").value) || 0;
+      const desc = document.getElementById("ch-desc-input").value.trim();
+
+      const newChallenge = {
+        id: "ch-" + Date.now(),
+        title: title,
+        category: category,
+        timeLimit: "2 min",
+        xp: xp,
+        desc: desc,
+        question: q,
+        options: [optA, optB, optC, optD],
+        answer: answer
+      };
+
+      challenges.unshift(newChallenge);
+      saveCMSData();
+      renderChallenges();
+      challengeModal.classList.remove("active");
+
+      broadcastToStudents({
+        type: "CHALLENGE_CREATED",
+        challenge: newChallenge
+      });
+
+      showToast(`Micro-challenge '${title}' deployed to students!`);
+      document.getElementById("create-challenge-form").reset();
+    });
+
+    /* ================= 10. CODING PLATFORMS PUBLISH HANDLERS ================= */
+    document.getElementById("publish-leetcode-task-btn").addEventListener("click", () => {
+      const slug = document.getElementById("leetcode-slug-input").value.trim();
+      const xp = document.getElementById("leetcode-xp-input").value;
+      localStorage.setItem("xplore_active_leetcode_task", JSON.stringify({ slug, xp }));
+      localStorage.setItem("orbit_active_leetcode_task", JSON.stringify({ slug, xp }));
+      broadcastToStudents({
+        type: "CODING_QUEST_UPDATED",
+        platform: "leetcode",
+        slug,
+        xp
+      });
+      showToast(`Assignment '${slug}' (+${xp} XP) published to student feeds!`);
+    });
+
+    document.getElementById("publish-codeforces-task-btn").addEventListener("click", () => {
+      const round = document.getElementById("codeforces-round-input").value.trim();
+      const xp = document.getElementById("codeforces-xp-input").value;
+      localStorage.setItem("xplore_active_codeforces_task", JSON.stringify({ round, xp }));
+      localStorage.setItem("orbit_active_codeforces_task", JSON.stringify({ round, xp }));
+      broadcastToStudents({
+        type: "CODING_QUEST_UPDATED",
+        platform: "codeforces",
+        round,
+        xp
+      });
+      showToast(`Contest Round '${round}' set (+${xp} XP bonus)!`);
+    });
+
+    document.getElementById("publish-github-task-btn").addEventListener("click", () => {
+      const repo = document.getElementById("github-repo-input").value.trim();
+      const mult = document.getElementById("github-multiplier-select").value;
+      localStorage.setItem("xplore_active_github_task", JSON.stringify({ repo, mult }));
+      localStorage.setItem("orbit_active_github_task", JSON.stringify({ repo, mult }));
+      broadcastToStudents({
+        type: "CODING_QUEST_UPDATED",
+        platform: "github",
+        repo,
+        mult
+      });
+      showToast(`GitHub Tracker updated for repo '${repo}' (${mult}x)!`);
+    });
+
+    document.getElementById("sync-coding-telemetry-btn").addEventListener("click", () => {
+      showToast("Syncing latest student problem solves from LeetCode & Codeforces APIs...");
+      setTimeout(() => {
+        showToast("Telemetry synced! 28 new problem submissions logged.");
+      }, 900);
+    });
+
+    document.getElementById("export-report-btn").addEventListener("click", () => {
+      const jsonStr = JSON.stringify({ students, quizzes, challenges }, null, 2);
+      const blob = new Blob([jsonStr], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "xplore_cohort_telemetry_report.json";
+      a.click();
+      showToast("Cohort report exported to JSON!");
+    });
+
+    /* ================= 11. FACULTY SECURITY GATE CONTROLLER ================= */
+    const authGate = document.getElementById("faculty-auth-gate");
+
+    function checkFacultyAuth() {
+      const isAuth = sessionStorage.getItem("xplore_faculty_auth") === "true" || sessionStorage.getItem("orbit_faculty_auth") === "true";
+      if (!isAuth) {
+        authGate.classList.add("active");
+      } else {
+        authGate.classList.remove("active");
+      }
+    }
+
+    document.getElementById("faculty-login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const pass = document.getElementById("faculty-pass-input").value.trim();
+      const errBox = document.getElementById("faculty-auth-error");
+
+      if (pass === "faculty2026" || pass === "admin") {
+        sessionStorage.setItem("xplore_faculty_auth", "true");
+        sessionStorage.setItem("orbit_faculty_auth", "true");
+        errBox.style.display = "none";
+        authGate.classList.remove("active");
+        showToast("Welcome Prof. Sterling! Faculty Console Unlocked.");
+      } else {
+        errBox.style.display = "block";
+      }
+    });
+
+    document.getElementById("quick-demo-faculty-btn").addEventListener("click", () => {
+      sessionStorage.setItem("xplore_faculty_auth", "true");
+      sessionStorage.setItem("orbit_faculty_auth", "true");
+      authGate.classList.remove("active");
+      showToast("Authenticated as Prof. Sterling (Lead Instructor)");
+    });
+
+    document.getElementById("faculty-logout-btn").addEventListener("click", () => {
+      sessionStorage.removeItem("xplore_faculty_auth");
+      sessionStorage.removeItem("orbit_faculty_auth");
+      checkFacultyAuth();
+      showToast("Faculty Console Locked");
+    });
+
+    checkFacultyAuth();
+
+    // Initial render
+    renderStudentTable();
+    renderActivityFeed();
+    renderQuizzesTable();
+    renderChallenges();
+    renderModules();
+    renderMaterialsTable();
+  </script>
+</body>
+</html>
